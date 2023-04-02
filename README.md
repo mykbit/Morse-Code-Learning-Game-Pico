@@ -1,5 +1,7 @@
-# Morse-Code-Learning-Game-Pico
+# Morse Code Learning Game Pico
+
+## Setup
 
 ```
-git submodule update --init --recursive
+git submodule update --init
 ```

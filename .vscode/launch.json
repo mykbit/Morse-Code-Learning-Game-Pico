@@ -1,0 +1,66 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Cool Unix Pico Debug",
+      "cwd": "${workspaceRoot}",
+      "executable": "${command:cmake.launchTargetPath}",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "gdbPath": "arm-none-eabi-gdb",
+      "device": "RP2040",
+      "configFiles": [
+        "interface/cmsis-dap-picoprobe.cfg",
+        "target/rp2040.cfg"
+      ],
+      "svdFile": "${workspaceRoot}/pico-sdk/src/rp2040/hardware_regs/rp2040.svd",
+      "postRestartCommands": [
+        "break main",
+        "continue"
+      ]
+    },
+    {
+      "name": "Unix Pico Debug",
+      "cwd": "${workspaceRoot}",
+      "executable": "${command:cmake.launchTargetPath}",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "gdbPath": "arm-none-eabi-gdb",
+      "device": "RP2040",
+      "configFiles": [
+        "interface/picoprobe.cfg",
+        "target/rp2040.cfg"
+      ],
+      "svdFile": "${workspaceRoot}/pico-sdk/src/rp2040/hardware_regs/rp2040.svd",
+      "postRestartCommands": [
+        "break main",
+        "continue"
+      ]
+    },
+    {
+      "name": "Windows Pico Debug",
+      "cwd": "${workspaceRoot}",
+      "executable": "${command:cmake.launchTargetPath}",
+      "request": "launch",
+      "type": "cortex-debug",
+      "servertype": "openocd",
+      "gdbPath": "arm-none-eabi-gdb",
+      "device": "RP2040",
+      "configFiles": [
+        "interface/picoprobe.cfg",
+        "target/rp2040.cfg"
+      ],
+      "searchDir": [
+        "D:\\Pico\\tools\\openocd-picoprobe\\scripts"
+      ],
+      "svdFile": "${workspaceRoot}/pico-sdk/src/rp2040/hardware_regs/rp2040.svd",
+      "runToMain": true,
+      "postRestartCommands": [
+        "break main",
+        "continue"
+      ]
+    }
+  ]
+}
