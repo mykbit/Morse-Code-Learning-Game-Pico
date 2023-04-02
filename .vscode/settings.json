@@ -1,0 +1,35 @@
+{
+  // These settings tweaks to the cmake plugin will ensure
+  // that you debug using cortex-debug instead of trying to launch
+  // a Pico binary on the host
+  "cmake.statusbar.advanced": {
+    "debug": {
+      "visibility": "hidden"
+    },
+    "launch": {
+      "visibility": "default"
+    },
+    "launchTarget": {
+      "visibility": "default"
+    },
+    "build": {
+      "visibility": "default"
+    },
+    "buildTarget": {
+      "visibility": "default"
+    }
+  },
+  "cmake.configureEnvironment": {
+    "PROJECT_NAME": "morse_code",
+  },
+  "cmake.generator": "Unix Makefiles",
+  "cmake.configureOnOpen": false,
+  "cmake.buildBeforeRun": true,
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "cortex-debug.enableTelemetry": false,
+  "cortex-debug.registerUseNaturalFormat": false,
+  "files.associations": {
+    "*.S": "arm",
+    "*.h": "c"
+  }
+}
