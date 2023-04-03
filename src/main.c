@@ -24,12 +24,33 @@ void asm_gpio_put(uint pin, bool value) {
     gpio_put(pin, value);
 }
 
+int select_level() {
+    int input = input_asm();
+    return parse_morse(input);
+}
+
 int main() {
     stdio_init_all();
 
-    printf("Hey!\n");
+    show_welcome_message();
+    char level = select_level();
 
-    main_asm();
+    switch(level) {
+        case '1':
+            start_first_level();
+            break;
+        case '2':
+            start_second_level();
+            break;
+        case '3':
+            start_third_level();
+            break;
+        case '4':
+            start_fourth_level();
+            break;
+        default:
+            printf("Invalid input");
+    }
 
     return 0;
 }
