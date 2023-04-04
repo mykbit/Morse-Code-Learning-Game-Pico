@@ -24,6 +24,16 @@ void asm_gpio_put(uint pin, bool value) {
     gpio_put(pin, value);
 }
 
+// Enable falling-edge interrupt – see SDK for detail on gpio_set_irq_enabled()
+void asm_gpio_set_irq_fall(uint pin) {
+    gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_FALL, true);
+}
+
+// Enable falling-edge interrupt – see SDK for detail on gpio_set_irq_enabled()
+void asm_gpio_set_irq_rise(uint pin) {
+    gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_RISE, true);
+}
+
 int select_level() {
     int input = input_asm();
     return parse_morse(input);
