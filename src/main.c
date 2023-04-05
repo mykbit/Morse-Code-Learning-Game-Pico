@@ -1,66 +1,58 @@
-#include <stdio.h>
-#include "pico/stdlib.h"
 #include "hardware/gpio.h"
+#include "pico/stdlib.h"
+#include <stdio.h>
 
 void main_asm();
 
 // Initialise a GPIO pin – see SDK for detail on gpio_init()
-void asm_gpio_init(uint pin) {
-    gpio_init(pin);
-}
+void asm_gpio_init(uint pin) { gpio_init(pin); }
 
 // Set direction of a GPIO pin – see SDK for detail on gpio_set_dir()
-void asm_gpio_set_dir(uint pin, bool out) {
-    gpio_set_dir(pin, out);
-}
+void asm_gpio_set_dir(uint pin, bool out) { gpio_set_dir(pin, out); }
 
 // Get the value of a GPIO pin – see SDK for detail on gpio_get()
-bool asm_gpio_get(uint pin) {
-    return gpio_get(pin);
-}
+bool asm_gpio_get(uint pin) { return gpio_get(pin); }
 
 // Set the value of a GPIO pin – see SDK for detail on gpio_put()
-void asm_gpio_put(uint pin, bool value) {
-    gpio_put(pin, value);
-}
+void asm_gpio_put(uint pin, bool value) { gpio_put(pin, value); }
 
 // Enable falling-edge interrupt – see SDK for detail on gpio_set_irq_enabled()
 void asm_gpio_set_irq_fall(uint pin) {
-    gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_FALL, true);
+  gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_FALL, true);
 }
 
 // Enable falling-edge interrupt – see SDK for detail on gpio_set_irq_enabled()
 void asm_gpio_set_irq_rise(uint pin) {
-    gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_RISE, true);
+  gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_RISE, true);
 }
 
 int select_level() {
-    int input = input_asm();
-    return parse_morse(input);
+  int input = input_asm();
+  return parse_morse(input);
 }
 
 int main() {
-    stdio_init_all();
+  stdio_init_all();
 
-    show_welcome_message();
-    char level = select_level();
+  // show_welcome_message();
+  // char level = select_level();
 
-    switch(level) {
-        case '1':
-            start_first_level();
-            break;
-        case '2':
-            start_second_level();
-            break;
-        case '3':
-            start_third_level();
-            break;
-        case '4':
-            start_fourth_level();
-            break;
-        default:
-            printf("Invalid input");
-    }
+  // switch(level) {
+  //     case '1':
+  //         start_first_level();
+  //         break;
+  //     case '2':
+  //         start_second_level();
+  //         break;
+  //     case '3':
+  //         start_third_level();
+  //         break;
+  //     case '4':
+  //         start_fourth_level();
+  //         break;
+  //     default:
+  //         printf("Invalid input");
+  // }
 
-    return 0;
+  return 0;
 }
