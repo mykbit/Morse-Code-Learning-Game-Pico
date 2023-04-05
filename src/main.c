@@ -37,8 +37,8 @@ void asm_gpio_set_irq_rise(uint pin) {
 }
 
 int select_level() {
-  int input = input_asm();
-  return parse_morse(input);
+  uint8_t input = input_asm();
+  return binary_to_ascii(input);
 }
 
 

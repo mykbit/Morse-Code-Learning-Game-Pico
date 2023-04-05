@@ -48,7 +48,7 @@ char* level3() {
   int index = rand() % 10;
   char* task_word = word_arr[index];
   char* task_morse = morse_word_arr[index];
-  printf("Level 3: %s\n or %s", task_word, task_morse);
+  printf("Level 3: %s or %s\n", task_word, task_morse);
   return task_word;
 }
 
