@@ -8,7 +8,7 @@ typedef struct {
     char *morse;
 } morse_table_t;
 
-const morse_table_t table[] = { 
+const morse_table_t morse_table[] = { 
     { 'A', ".-"    },
     { 'B', "-..."  },
     { 'C', "-.-."  },
