@@ -20,7 +20,7 @@
 .equ ALRM_ISR_OFFSET, 0x40                          @ ALARM0 is int #0 (vector table entry16)
 .equ WATCHDOG_LOAD_OFFSET, 0x04
 
-.equ BUTTON_VARIABLE, 0
+.equ BUTTON_VARIABLE, 1                             @ has to be 1 to show the start of the sequence, if not using PRESSED_COUNTER
 .equ PRESSED_COUNTER, 0
 .equ SEQUNECE_DONE, 0
 
