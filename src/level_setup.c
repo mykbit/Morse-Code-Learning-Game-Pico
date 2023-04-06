@@ -29,18 +29,18 @@ const char* morse_word_arr[] = {".... . .-.. .-.. ---",
                                 ". -.. .- -. -.. .",
                                 ".--- .- ...- .-"};
 
-char level1() {
+char* level1() {
   int index = rand() % 36;
-  char task_letter = alphanum_arr[index];
-  char task_morse = morse_alphanum_arr[index];
-  printf("Level 1: %c or &s\n", task_letter, task_morse);
+  char* task_letter = alphanum_arr[index];
+  char* task_morse = morse_alphanum_arr[index];
+  printf("Level 1: %s or &s\n", task_letter, task_morse);
   return task_letter;
 }
 
-char level2() {
+char* level2() {
   int index = rand() % 36;
-  char task_letter = alphanum_arr[index];
-  printf("Level 2: %c or &s\n", task_letter);
+  char* task_letter = alphanum_arr[index];  
+  printf("Level 2: &s\n", task_letter);
   return task_letter;
 }
 
