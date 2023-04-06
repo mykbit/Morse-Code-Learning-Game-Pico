@@ -61,10 +61,57 @@ static inline uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b) {
   return ((uint32_t)(r) << 8) | ((uint32_t)(g) << 16) | (uint32_t)(b);
 }
 
-int select_level() {
+char select_level() {
+  printf("+---------------------------------------------------------------------+\n");
+  printf("|                                                                     |\n");
+  printf("|            --- USE GP21 TO INPUT A SEQUENCE TO BEGIN ---            |\n");
+  printf("|                                                                     |\n");
+  printf("|                  '-----' - LEVEL 01 - CHARS (EASY)                  |\n");
+  printf("|                  '.----' - LEVEL 02 - CHARS (HARD)                  |\n");
+  printf("|                  '..---' - LEVEL 03 - WORDS (EASY)                  |\n");
+  printf("|                  '...--' - LEVEL 04 - WORDS (HARD)                  |\n");
+  printf("|                                                                     |\n");
+  printf("+---------------------------------------------------------------------+\n");
   uint8_t input = input_asm();
-  return binary_to_ascii(input);
+  char selected_level = binary_to_ascii(input);
+  if (selected_level == '1')
+  {
+    return level1();
+  }
+  else if (selected_level == '2') {
+    return level2();
+  }
+  else if (selected_level == '3') {
+    return level3();
+  }
+  else if (selected_level == '4') {
+    return level4();
+  }
+  else {
+    printf("Invalid input. Try again.\n");
+    return select_level();
+  }
 }
+
+void level_play(char selected_level, char* task, int index) {
+  printf("Level %c start!\n", selected_level);
+  char input_char = binary_to_ascii(input_asm());
+  if (input_char == "?") {
+    return select_level();
+  }
+  if (evaluate_input(task, input_char, index)) {
+    printf("Correct!\n");
+    index++;
+    level_play(selected_level, task, index);
+  }
+  else {
+    printf("Incorrect!\n");
+    index = 0;
+    level_play(selected_level, task, index);
+  }
+
+}
+
 
 /**
  * @brief EXAMPLE - WS2812_RGB
@@ -102,15 +149,6 @@ int main() {
   printf("|     #   ##   #    #      #    #    #              #    #            |\n");
   printf("|     #        #    #      #    #     #      #      #    #            |\n");
   printf("|     #        #    ########    #      #      #####      ########     |\n");
-  printf("|                                                                     |\n");
-  printf("+---------------------------------------------------------------------+\n");
-  printf("|                                                                     |\n");
-  printf("|            --- USE GP21 TO INPUT A SEQUENCE TO BEGIN ---            |\n");
-  printf("|                                                                     |\n");
-  printf("|                  '-----' - LEVEL 01 - CHARS (EASY)                  |\n");
-  printf("|                  '.----' - LEVEL 02 - CHARS (HARD)                  |\n");
-  printf("|                  '..---' - LEVEL 03 - WORDS (EASY)                  |\n");
-  printf("|                  '...--' - LEVEL 04 - WORDS (HARD)                  |\n");
   printf("|                                                                     |\n");
   printf("+---------------------------------------------------------------------+\n");
   // clang-format on
