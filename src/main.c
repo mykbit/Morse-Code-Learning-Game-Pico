@@ -111,6 +111,63 @@ void level_play(char selected_level, char* task, int index) {
   }
 
 }
+char select_level() {
+  printf("+---------------------------------------------------------------------+\n");
+  printf("|                                                                     |\n");
+  printf("|            --- USE GP21 TO INPUT A SEQUENCE TO BEGIN ---            |\n");
+  printf("|                                                                     |\n");
+  printf("|                  '-----' - LEVEL 01 - CHARS (EASY)                  |\n");
+  printf("|                  '.----' - LEVEL 02 - CHARS (HARD)                  |\n");
+  printf("|                  '..---' - LEVEL 03 - WORDS (EASY)                  |\n");
+  printf("|                  '...--' - LEVEL 04 - WORDS (HARD)                  |\n");
+  printf("|                                                                     |\n");
+  printf("+---------------------------------------------------------------------+\n");
+
+  uint8_t input = input_asm();
+  char selected_level = binary_to_ascii(input);
+  
+  if (selected_level == '1')
+  {
+    return level1();
+  }
+  else if (selected_level == '2') {
+    return level2();
+  }
+  else if (selected_level == '3') {
+    return level3();
+  }
+  else if (selected_level == '4') {
+    return level4();
+  }
+  else {
+    printf("Invalid input. Try again.\n");
+    return select_level();
+  }
+}
+
+void level_play (char* task, int index, int consequent_wins) {
+  char input_char = binary_to_ascii(input_asm());
+  if (input_char == "?") {
+    consequent_wins++;
+    if (consequent_wins >= 5)
+    {
+      printf("You won the game!\n");
+      level_play(select_level(), 0, 0);
+    }
+    return select_level();
+  }
+  if (evaluate_input(task, input_char, index)) {
+    printf("Correct!\n");
+    level_play(task, ++index, consequent_wins);
+  }
+  else {
+    printf("Incorrect!\n");
+    consequent_wins = 0;
+    index = 0;
+    level_play(task, index, consequent_wins);
+  }
+
+}
 
 
 /**
