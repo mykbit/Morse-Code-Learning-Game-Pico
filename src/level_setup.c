@@ -30,6 +30,12 @@ char* morse_word_arr[] = {".... . .-.. .-.. ---",
                           ". -.. .- -. -.. .",
                           ".--- .- ...- .-"};
 
+
+/**
+ * @brief Level 1
+ * 
+ * @return char*
+ */
 char* level1() {
   int index = rand() % 36;
   char* task_letter = &alphanum_arr[index];
@@ -38,6 +44,12 @@ char* level1() {
   return task_letter;
 }
 
+
+/**
+ * @brief Level 2
+ *
+ * @return char*  
+ */
 char* level2() {
   int index = rand() % 36;
   char* task_letter = &alphanum_arr[index];
@@ -45,6 +57,12 @@ char* level2() {
   return task_letter;
 }
 
+
+/**
+ * @brief Level 3
+ * 
+ * @return char*  
+ */
 char* level3() {
   int index = rand() % 10;
   char* task_word = word_arr[index];
@@ -53,6 +71,12 @@ char* level3() {
   return task_word;
 }
 
+
+/**
+ * @brief Level 4
+ * 
+ * @return char*  
+ */
 char* level4() {
   int index = rand() % 10;
   char* task_word = word_arr[index];
