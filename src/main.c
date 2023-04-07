@@ -67,6 +67,13 @@ static inline uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b) {
   return ((uint32_t)(r) << 8) | ((uint32_t)(g) << 16) | (uint32_t)(b);
 }
 
+
+/**
+ * @brief Select Level
+ *
+ * @return char*  
+ */
+
 char* select_level() {
   printf("+---------------------------------------------------------------------+\n");
   printf("|                                                                     |\n");
@@ -105,6 +112,18 @@ char* select_level() {
   }
 }
 
+
+
+/**
+ * @brief 
+ * 
+ * @param char current_level
+ * @param char* task
+ * @param int index
+ * @param int consequent_wins
+ *
+ * @return char*  
+ */
 char* level_play (char current_level, char* task, int index, int consequent_wins) {
   char input_char = binary_to_ascii(input_asm());
   if (input_char == '?') {
@@ -146,11 +165,9 @@ char* level_play (char current_level, char* task, int index, int consequent_wins
 
 
 /**
- * @brief EXAMPLE - WS2812_RGB
- *        Simple example to initialise the NeoPixel RGB LED on
- *        the MAKER-PI-PICO and then flash it in alternating
- *        colours between red, green and blue forever using
- *        one of the RP2040 built-in PIO controllers.
+ * @brief Main
+ * 
+ * @param 
  *
  * @return int  Application return code (zero for success).
  */
