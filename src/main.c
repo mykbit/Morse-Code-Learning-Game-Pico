@@ -124,7 +124,6 @@ char* select_level() {
  *        Plays the game at the specified level with the given task 
  *        and input index, and keeps track of the number of
  *        consequent wins.
- * 
  * @param current_level   The current level of the game.
  * @param task            The current task to be evaluated.
  * @param index           The index of the input character to be evaluated.

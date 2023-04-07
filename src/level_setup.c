@@ -33,8 +33,11 @@ char* morse_word_arr[] = {".... . .-.. .-.. ---",
 
 /**
  * @brief Level 1
- * 
- * @return char*
+ *        Generates a random task for level 1 and displays it to the user.
+ *        The function generates a random index between 0 and 35, selects a corresponding alphanumeric character and its Morse code
+ *        from the pre-defined arrays, and displays them to the user as the task for level 1. The function returns a pointer to the
+ *        selected alphanumeric character.
+ *  @return A pointer to the selected alphanumeric character.
  */
 char* level1() {
   int index = rand() % 36;
@@ -47,9 +50,12 @@ char* level1() {
 
 /**
  * @brief Level 2
- *
- * @return char*  
- */
+ *        Generates a random task for level 2 and displays it to the user.
+ *         The function generates a random index between 0 and 35, selects a corresponding alphanumeric character from the pre-defined
+ *         array, and displays it to the user as the task for level 2. The function returns a pointer to the selected alphanumeric
+ *         character.
+ * @return A pointer to the selected alphanumeric character.
+*/
 char* level2() {
   int index = rand() % 36;
   char* task_letter = &alphanum_arr[index];
@@ -60,8 +66,10 @@ char* level2() {
 
 /**
  * @brief Level 3
- * 
- * @return char*  
+ *        Generates a random task for level 3 and displays it to the user.
+ *        The function generates a random index between 0 and 9, selects a corresponding word and its Morse code from the pre-defined
+ *        arrays, and displays them to the user as the task for level 3. The function returns a pointer to the selected word.
+ * @return A pointer to the selected word.
  */
 char* level3() {
   int index = rand() % 10;
@@ -74,9 +82,11 @@ char* level3() {
 
 /**
  * @brief Level 4
- * 
- * @return char*  
- */
+ *        Generates a random task for level 4 and displays it to the user.
+ *        The function generates a random index between 0 and 9, selects a corresponding word from the pre-defined array, and displays
+ *        it to the user as the task for level 4. The function returns a pointer to the selected word.
+ * @return A pointer to the selected word.
+*/
 char* level4() {
   int index = rand() % 10;
   char* task_word = word_arr[index];
