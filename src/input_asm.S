@@ -93,7 +93,8 @@ svc_isr:
  movs r1, #0x1
  str r1, [r0] 
 
- ldr r0, =seqdone
+ @ its a dash not a dot
+ ldr r0, =long
  ldr r1, [r0]
  mov r1, #1
  str r1, [r0]
