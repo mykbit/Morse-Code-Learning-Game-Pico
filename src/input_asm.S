@@ -106,13 +106,18 @@ svc_done:
 gpio_isr:
  push {lr}
 
- ldr r0, =(IO_BANK0_BASE + IO_BANK0_PROC0_INTS2_OFFSET)
+@enable the alarm interrupt 
+ ldr r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
+ movs r1, #0x1
  str r1, [r0]
+ 
+ ldr r0, =(IO_BANK0_BASE + IO_BANK0_PROC0_INTS2_OFFSET)
+ ldr r1, [r0]
 
  ldr r0, =(IO_BANK0_BASE + IO_BANK0_INTR2_OFFSET)
  str r1, [r0]
-
-  ldr r2, =GPIO_FALLING_EDGE
+ 
+ ldr r2, =GPIO_FALLING_EDGE
  cmp r1, r2
  beq set_alarm
  ldr r2, =GPIO_RISING_EDGE
@@ -150,13 +155,15 @@ dash:
  bl done
 
 done:
+
+/*
  bl set_alarm
  
 @enable the alarm interrupt 
  ldr r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
  movs r1, #0x1
  str r1, [r0]
-
+*/
  pop {pc}
 
 set_alarm:
