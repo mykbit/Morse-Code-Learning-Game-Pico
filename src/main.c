@@ -69,10 +69,15 @@ static inline uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b) {
 
 
 /**
- * @brief Select Level
- *
- * @return char*  
- */
+ * @brief select_Level
+ *        Prompts the user to select a level and returns the corresponding level function 
+ *        based on the user's input (morse code). The function displays the menu of four levels 
+ *        to the user, prompts the user to input a sequence of morse code using the GP21 button,
+ *        converts the morse code into an ASCII character, and selects the corresponding level 
+ *        function based on the input. 
+ *        If the input is invalid, the function prompts the user to try again.
+ * @return A pointer to the selected level function.
+*/
 
 char* select_level() {
   printf("+---------------------------------------------------------------------+\n");
@@ -115,7 +120,8 @@ char* select_level() {
 
 
 /**
- * @brief Plays the game at the specified level with the given task 
+ * @brief level_play
+ *        Plays the game at the specified level with the given task 
  *        and input index, and keeps track of the number of
  *        consequent wins.
  * 
