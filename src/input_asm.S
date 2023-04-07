@@ -107,7 +107,7 @@ install_alarm1_isr:
 @ SVC interrupt service handler routine
 .thumb_func @ Required for all interrupt service routines
 
-// alaram interrut 
+// alarm0 interrut 
 alarm0_isr:
  push {lr}                                      
  
@@ -139,24 +139,25 @@ alarm0_done:
 
 .thumb_func
 
-alarm0_isr:
+// alarm1 interrupt
+alarm1_isr:
  push {lr}                                      
  
 @disable the interrupt 
  ldr r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
- movs r1, #0x1
+ movs r1, #0x2
  str r1, [r0]
 
 @enable alarm 
  ldr r0, =(TIMER_BASE + TIMER_INTE_OFFSET)
  ldr r2, [r0]
- movs r1, #0x1
+ movs r1, #0x2
  orr r1, r2
  str r1, [r0] 
 
 @clear alarm
  ldr r0, =(TIMER_BASE + TIMER_INTR_OFFSET)
- movs r1, #0x1
+ movs r1, #0x2
  str r1, [r0] 
 
 @ its a dash not a dot
