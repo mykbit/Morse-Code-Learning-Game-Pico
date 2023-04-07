@@ -23,6 +23,7 @@
 .equ BUTTON_VARIABLE, 1                             @ has to be 1 to show the start of the sequence, if not using PRESSED_COUNTER
 .equ PRESSED_COUNTER, 0
 .equ SEQUNECE_DONE, 0
+.equ DASH, 0
 
 @ Entry point to the ASM portion of the program
 main_asm:
@@ -46,6 +47,7 @@ main_loop:
  bne main_loop
  ldr r1, =bv
  ldr r0, [r1]
+ bl exit
  
 init_gpio_led:
 push    {lr}
@@ -109,12 +111,18 @@ gpio_isr:
  ldr r0, =(IO_BANK0_BASE + IO_BANK0_INTR2_OFFSET)
  str r1, [r0]
 
- ldr r2, =GPIO_BTN_EN_MSK
+  ldr r2, =GPIO_FALLING_EDGE
  cmp r1, r2
- beq dot
- ldr r2, =GPIO_BTN_EN_MSK_HIGH
+ beq set_alarm
+ ldr r2, =GPIO_RISING_EDGE
  cmp r1, r2
+
+input:
+ ldr r0, =long
+ ldr r1, [r0]
+ cmp r1, #1
  beq dash
+
 
 dot:
  ldr r0, =bv
@@ -177,6 +185,8 @@ gpio_irq_enable:
  bl asm_gpio_set_irq
  pop {pc}
 
+exit:
+
 .align 4
 msg: .asciz "Hello World!\n"
 .data
@@ -186,3 +196,4 @@ ltimer: .word DFLT_ALARM_TIME
 bv: .int BUTTON_VARIABLE
 pcnt: .int PRESSED_COUNTER
 seqdone: .word SEQUNECE_DONE
+long: .word DASH
