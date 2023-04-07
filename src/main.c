@@ -173,8 +173,6 @@ char* level_play (char current_level, char* task, int index, int consequent_wins
 
 /**
  * @brief Main
- * 
- * @param 
  *
  * @return int  Application return code (zero for success).
  */
