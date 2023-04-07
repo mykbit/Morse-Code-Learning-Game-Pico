@@ -198,11 +198,6 @@ dot:
  lsls r1, #1
  orr r1, #1
  str r1, [r0]
-
- ldr r0, =pcnt
- ldr r1, [r0]
- add r1, r1 #1
- str r1, [r0]
  
  bl done
 
@@ -213,11 +208,10 @@ dash:
  orr r1, #0
  str r1, [r0]
  
- ldr r0, =pcnt
+ ldr r0, =long
  ldr r1, [r0]
- add r1, r1 #1
+ movs r1, #0
  str r1, [r0]
- 
  bl done
 
 done:
