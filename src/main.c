@@ -115,14 +115,16 @@ char* select_level() {
 
 
 /**
- * @brief 
+ * @brief Plays the game at the specified level with the given task 
+ *        and input index, and keeps track of the number of
+ *        consequent wins.
  * 
- * @param char current_level
- * @param char* task
- * @param int index
- * @param int consequent_wins
+ * @param current_level   The current level of the game.
+ * @param task            The current task to be evaluated.
+ * @param index           The index of the input character to be evaluated.
+ * @param consequent_wins The number of consequent wins in a row.
  *
- * @return char*  
+ * @return The task for the next level of the game. 
  */
 char* level_play (char current_level, char* task, int index, int consequent_wins) {
   char input_char = binary_to_ascii(input_asm());
