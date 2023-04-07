@@ -1,5 +1,10 @@
 #include "morse.h"
 
+/**
+ * @brief 
+ * 
+ * @param 
+ */
 char morse_to_ascii(char *morse) {
   for (int i = 0; i < (sizeof(morse_table) / sizeof(morse_table_t)); i++)
     if (strcmp(morse, morse_table[i].morse) == 0) {
@@ -9,6 +14,11 @@ char morse_to_ascii(char *morse) {
   return '?';
 }
 
+/**
+ * @brief 
+ * 
+ * @param 
+ */
 char *binary_to_morse(uint8_t binary) {
   int size = 1;
 
@@ -23,6 +33,11 @@ char *binary_to_morse(uint8_t binary) {
   return result;
 }
 
+/**
+ * @brief 
+ * 
+ * @param 
+ */
 char binary_to_ascii(uint8_t binary) {
   char *morse = binary_to_morse(binary);
   char result = morse_to_ascii(morse);
