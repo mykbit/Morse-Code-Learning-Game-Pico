@@ -11,7 +11,8 @@
 
 .equ DFLT_STATE_STRT, 1                             @ Specify the value to start flashing
 .equ DFLT_STATE_STOP, 0                             @ Specify the value to stop flashing
-.equ DFLT_ALARM_TIME, 1000000                       @ Specify the default alarm timeout
+.equ DFLT_ALARM_TIME, 1000000                       @ Specify the default alarm0 timeout
+.equ DFLT_ALARM1_TIME, 3000000                       @ Specify the default alarm1 timeout
 
 .equ GPIO_FALLING_EDGE, 0x00400000                  @ Bit-22 for falling-edge event on GP21
 .equ GPIO_RISING_EDGE, 0x00800000                   @ Bit-23 for rising-edge event on GP21
@@ -160,11 +161,12 @@ alarm1_isr:
  movs r1, #0x2
  str r1, [r0] 
 
-@ its a dash not a dot
- ldr r0, =long
+@ we are done
+ ldr r0, =seqdone
  ldr r1, [r0]
  mov r1, #1
  str r1, [r0]
+
 
 alarm1_done:
  pop {pc} 
@@ -213,17 +215,12 @@ dash:
  ldr r1, [r0]
  movs r1, #0
  str r1, [r0]
+ 
  bl done
 
 done:
-/* 
- bl set_alarm
+ bl set_alarm1
  
-@enable the alarm interrupt 
- ldr r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
- movs r1, #0x1
- str r1, [r0]
-*/
  pop {pc}
 
 set_alarm0:
@@ -244,12 +241,13 @@ set_alarm1:
  @set alarm
  ldr r0, =(TIMER_BASE + TIMER_TIMELR_OFFSET)
  ldr r0, [r0]
- ldr r1, =ltimer
+ ldr r1, =l1timer
  ldr r1, [r1]
  add r1, r1, r0
  ldr r0, =(TIMER_BASE + TIMER_ALARM1_OFFSET)
  str r1, [r0]
 
+ 
  pop {pc}
 irq_enable_mask:
 @ r0 = mask
@@ -276,7 +274,7 @@ msg: .asciz "Hello World!\n"
 enable: .word ENABLE_DISABLE_STATE
 lstate: .word DFLT_STATE_STRT
 ltimer: .word DFLT_ALARM_TIME
-bv: .int BUTTON_VARIABLE
-pcnt: .int PRESSED_COUNTER
+bv: .word BUTTON_VARIABLE
+l1timer: .word DFLT_ALARM1_TIME
 seqdone: .word SEQUNECE_DONE
 long: .word DASH
