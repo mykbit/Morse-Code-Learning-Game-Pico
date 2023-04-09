@@ -13,8 +13,8 @@
 #define NUM_PIXELS 1   // There is 1 WS2812 device in the chain
 #define WS2812_PIN 28  // The GPIO pin that the WS2812 connected to
 
-char level;
-int consequent_wins;
+char selected_level;
+int consequent_wins = 0;
 
 void main_asm();
 
@@ -92,24 +92,34 @@ char* select_level() {
   printf("+---------------------------------------------------------------------+\n");
 
   uint8_t input = input_asm();
-  char selected_level = binary_to_ascii(input);
+  selected_level = binary_to_ascii(input);
 
   if (selected_level == '1')
   {
-    level = selected_level;
     return level1();
   }
   else if (selected_level == '2') {
-    level = selected_level;
     return level2();
   }
-  else if (selected_level == '3') {
-    level = selected_level;
-    return level3();
+  else {
+    printf("Invalid input. Try again.\n");
+    return select_level();
   }
-  else if (selected_level == '4') {
-    level = selected_level;
-    return level4();
+}
+
+
+/**
+ * @brief level_restart
+ *        Restarts the game at the specified level.
+ * @param selected_level The level to restart the game at.
+ * @return               The task for the next level of the game. 
+ */
+char* level_restart (selected_level) {
+  if (selected_level == '1') {
+    return level1();
+  }
+  else if (selected_level == '2') {
+    return level2();
   }
   else {
     printf("Invalid input. Try again.\n");
@@ -121,53 +131,41 @@ char* select_level() {
 
 /**
  * @brief level_play
- *        Plays the game at the specified level with the given task 
- *        and input index, and keeps track of the number of
- *        consequent wins.
- * @param current_level   The current level of the game.
- * @param task            The current task to be evaluated.
- * @param index           The index of the input character to be evaluated.
- * @param consequent_wins The number of consequent wins in a row.
- *
- * @return The task for the next level of the game. 
+ *        Plays the game at the specified level.
+ *        The function takes in the task for the current level and the level number.
+ *        It then prompts the user to input a sequence of morse code using the GP21 button,
+ *        converts the morse code into an ASCII character, and compares it to the first character
+ *        of the task. If the input is correct, the function calls itself recursively with the
+ *        task and level number as parameters. If the input is incorrect, the function returns.
+ * 
+ * @param task             The task for the current level
+ * @param selected_level   The level number
  */
-char* level_play (char current_level, char* task, int index, int consequent_wins) {
-  char input_char = binary_to_ascii(input_asm());
-  if (input_char == '?') {
-    consequent_wins++;
-    if (consequent_wins >= 5)
-    {
-      printf("You won the game!\n");
-      level_play(current_level, select_level(), 0, 0);
-    }
-    return select_level();
-  }
-  if (evaluate_input(task, input_char, index)) {
+void level_play (char* task, char selected_level) {
+  uint8_t input = input_asm();
+  char input_char = binary_to_ascii(input);
+
+
+
+  if (input_char == task[0]) {
     printf("Correct!\n");
-    level_play(current_level, task, ++index, consequent_wins);
+    consequent_wins++;
+    if (consequent_wins < 5) {
+      level_play(level_restart(selected_level), selected_level);
+    }
+    else {
+      printf("You won the game!\n");
+      level_play(select_level(), selected_level);
+    }
   }
   else {
     printf("Incorrect!\n");
-    consequent_wins = 0;
-    index = 0;
-    if (current_level == '1') {
-      task = level1();
+    consequent_wins--;
+    if (consequent_wins <= 0) {
+      printf("You lost the game!\n");
+      return;
     }
-    else if (current_level == '2') {
-      task = level2();
-    }
-    else if (current_level == '3') {
-      task = level3();
-    }
-    else if (current_level == '4') {
-      task = level4();
-    }
-    else {
-      current_level = select_level();
-    }
-    level_play(current_level, task, index, consequent_wins);
   }
-
 }
 
 
