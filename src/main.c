@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "hardware/clocks.h"
 #include "hardware/pio.h"
+#include "hardware/gpio.h"
 #include "pico/stdlib.h"
 #include "ws2812.pio.h"
 #include "level_setup.h"
@@ -16,7 +18,8 @@
 char selected_level;
 int consequent_wins = 0;
 
-void main_asm();
+// Input assembly function
+unsigned int input_asm();
 
 // Initialise a GPIO pin – see SDK for detail on gpio_init()
 void asm_gpio_init(uint pin) { gpio_init(pin); }
@@ -30,14 +33,19 @@ bool asm_gpio_get(uint pin) { return gpio_get(pin); }
 // Set the value of a GPIO pin – see SDK for detail on gpio_put()
 void asm_gpio_put(uint pin, bool value) { gpio_put(pin, value); }
 
-// Enable falling-edge interrupt – see SDK for detail on gpio_set_irq_enabled()
-void asm_gpio_set_irq_fall(uint pin) {
+// Enable falling-edge interrupt
+void asm_gpio_set_irq_edge_fall(uint pin) {
   gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_FALL, true);
 }
 
-// Enable falling-edge interrupt – see SDK for detail on gpio_set_irq_enabled()
-void asm_gpio_set_irq_rise(uint pin) {
+// Enable rising-edge interrupt
+void asm_gpio_set_irq_edge_rise(uint pin) {
   gpio_set_irq_enabled(pin, GPIO_IRQ_EDGE_RISE, true);
+}
+
+// Get timestamp in ms
+uint32_t time_ms() {
+  return (unsigned int)(time_us_64() / CLOCKS_PER_SEC / 10);
 }
 
 /**
@@ -204,6 +212,9 @@ int main() {
   printf("|                                                                     |\n");
   printf("+---------------------------------------------------------------------+\n");
   // clang-format on
+  
+  unsigned int test = input_asm();
+  printf("%d", test);
 
   return 0;
 }
