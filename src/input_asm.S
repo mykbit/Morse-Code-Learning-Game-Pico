@@ -4,277 +4,278 @@
 #include "hardware/regs/m0plus.h"
 
 .syntax unified
-.cpu cortex-m0plus
+.cpu    cortex-m0plus
 .thumb
-.global main_asm
-.align 4
+.global input_asm
+.align  4
 
-.equ DFLT_STATE_STRT, 1                             @ Specify the value to start flashing
-.equ DFLT_STATE_STOP, 0                             @ Specify the value to stop flashing
-.equ DFLT_ALARM_TIME, 1000000                       @ Specify the default alarm0 timeout
-.equ DFLT_ALARM1_TIME, 3000000                       @ Specify the default alarm1 timeout
+.equ    GPIO_DIR_IN,            0               @ Specify input direction for a GPIO pin
+.equ    GPIO_DIR_OUT,           1               @ Specify output direction for a GPIO pin
 
-.equ GPIO_FALLING_EDGE, 0x00400000                  @ Bit-22 for falling-edge event on GP21
-.equ GPIO_RISING_EDGE, 0x00800000                   @ Bit-23 for rising-edge event on GP21
+.equ    GP21,                   21              @ Specify pin for the GP21 button
+.equ    GP21_EDGE_FALL_MASK,    0x00400000      @ GP21 edge fall mask
+.equ    GP21_EDGE_RISE_MASK,    0x00800000      @ GP21 edge rise mask
 
-.equ GPIO_BTN_EN, 21                                @ Specify pin for the "enter" button
-.equ GPIO_DIR_IN, 0                                 @ Specify input direction for a GPIO pin
-.equ GPIO_ISR_OFFSET, 0x74                          @ GPIO is int #13 (vector table entry 29)
-.equ ALRM0_ISR_OFFSET, 0x40                         @ ALARM0 is int #0 (vector table entry16)
-.equ ALRM0_ISR_OFFSET, 0x44                         @ ALARM1 is int #1 (vector table entry17)
-.equ WATCHDOG_LOAD_OFFSET, 0x04
-.equ ENABLE_DISABLE_STATE, 0
+.equ    GPIO_ISR_OFFSET,        0x74            @ GPIO is int #13 (vector table entry 29)
+.equ    ALARM0_ISR_OFFSET,      0x40            @ ALARM0 is int #0 (vector table entry 16)
 
-.equ BUTTON_VARIABLE, 0
-.equ PRESSED_COUNTER, 0
-.equ SEQUNECE_DONE, 0
-.equ DASH, 0
+.equ    ALARM0_DELAY,           1000000         @ Alarm delay
 
-@ Entry point to the ASM portion of the program
-main_asm:
+.equ    DOT,                    0               @ "." in morse_buffer
+.equ    DASH,                   1               @ "-" in morse_buffer
 
- bl install_alarm0_isr          @ Install the alarm interrupt service routine
- bl install_gpio_isr            @ Install the gpio interrupt service routine
+.equ    MORSE_BUFFER_DFLT,      1               @ Default morse_buffer value
+.equ    EDGE_FALL_TIME_DFLT,    1               @ Default edge_fall_time value
+.equ    IS_INPUT_DONE_DFLT,     0               @ Default edge_fall_time value
 
- movs r0, #0x1                  @ Bit[0]
- bl irq_enable_mask             @ Enable the alarm mask  
 
- movs r0, #0x2                  @ Bit[1]
- bl irq_enable_mask             @ Enable the alarm mask
+/*
+ * Entrypoint to the ASM program
+ */
+input_asm:
+    push    {lr}
+    bl      init_gp21
+    bl      install_gpio_isr
+    bl      install_alarm_isr
+input_asm_loop:
+    ldr     r1, =is_input_done
+    ldr     r0, [r1]
+    cmp     r0, #1
+    beq     input_asm_done
+    b       input_asm_loop
+input_asm_done:
+    bl      remove_gpio_isr
+    bl      cancel_alarm_isr
+    bl      remove_alarm_isr
+    ldr     r1, =morse_buffer
+    ldr     r0, [r1]
+    pop     {pc}
 
- bl gpio_irq_enable             @ enable the gpio interrupt
- ldr r0, =0x2000                @ Bit[13]
- bl irq_enable_mask             @ Enable the gpio mask
+/*
+ * ------------------------ gpio_isr -------------------------
+ */
 
-@enable alarm0
- ldr r0, =(TIMER_BASE + TIMER_INTE_OFFSET)
- ldr r2, [r0]
- movs r1, #0x1
- orr r1, r2
- str r1, [r0] 
+/*
+ * Initialize gp21
+ */
+init_gp21:
+    push    {lr}
+    movs    r0, #GP21
+    bl      asm_gpio_init
+    movs    r0, #GP21
+    movs    r1, #GPIO_DIR_IN
+    bl      asm_gpio_set_dir
+    movs    r0, #GP21
+    bl      asm_gpio_set_irq_edge_fall
+    movs    r0, #GP21
+    bl      asm_gpio_set_irq_edge_rise
+    pop     {pc}
 
-@enable alarm1
- ldr r0, =(TIMER_BASE + TIMER_INTE_OFFSET)
- ldr r2, [r0]
- movs r1, #0x2
- orr r1, r2
- str r1, [r0]
-
-main_loop:
- 
- ldr r1, =seqdone
- ldr r2, [r1]
- cmp r2, #1
- bne main_loop
- ldr r1, =bv
- ldr r0, [r1]
- bl exit
- 
-init_gpio_led:
-push    {lr}
- movs    r0, #GPIO_BTN_EN
- bl      asm_gpio_init
- movs    r0, #GPIO_BTN_EN
- movs    r1, #GPIO_DIR_IN
- bl      asm_gpio_set_dir                  
-pop     {pc}
-
-install_alarm0_isr:
- ldr r2, =(PPB_BASE + M0PLUS_VTOR_OFFSET)       @ the address of the exceptions vector table
- ldr r1, [r2]                                   @ save the address
- movs r2, #ALRM0_ISR_OFFSET                     @ get the offset for the particular interrrupt that we want
- add r2, r1                                     @ add it to the address of the vector table
- ldr r0, =alarm0_isr                            @ now direct that exception to the svc_isr function
- str r0, [r2]                                   @ now when that exception is called, the processor will go to svc_isr
- bx lr                                          @ branch to link register
-
+/*
+ * Install gpio_isr
+ */
 install_gpio_isr:
- ldr r2, =(PPB_BASE + M0PLUS_VTOR_OFFSET)
- ldr r1, [r2]
- movs r2, #GPIO_ISR_OFFSET
- add r2, r1
- ldr r0, =gpio_isr
- str r0, [r2]
- bx lr
+    @ Set gpio_isr to GPIO_ISR_OFFSET in the vector table
+    ldr     r2, =(PPB_BASE + M0PLUS_VTOR_OFFSET)
+    ldr     r1, [r2]
+    ldr     r0, =gpio_isr
+    str     r0, [r1, #GPIO_ISR_OFFSET]
+    @ Enable GPIO interrupt clearing in NVIC_ICPR register
+    ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
+    movs    r1, #1
+    lsls    r1, #13
+    str     r1, [r0]
+    @ Enable GPIO interrupt in NVIC_ISER register
+    ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)
+    movs    r1, #1
+    lsls    r1, #13
+    str     r1, [r0]
+    bx      lr
 
-install_alarm1_isr:
- ldr r2, =(PPB_BASE + M0PLUS_VTOR_OFFSET)       @ the address of the exceptions vector table
- ldr r1, [r2]                                   @ save the address
- movs r2, #ALRM1_ISR_OFFSET                     @ get the offset for the particular interrrupt that we want
- add r2, r1                                     @ add it to the address of the vector table
- ldr r0, =alarm1_isr                            @ now direct that exception to the svc_isr function
- str r0, [r2]                                   @ now when that exception is called, the processor will go to svc_isr
- bx lr  
-@ SVC interrupt service handler routine
-.thumb_func @ Required for all interrupt service routines
+/*
+ * Remove gpio_isr
+ */
+remove_gpio_isr:
+    @ Enable GPIO interrupt clearing in NVIC_ICPR register
+    ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
+    movs    r1, #0
+    lsls    r1, #13
+    str     r1, [r0]
+    @ Enable GPIO interrupt in NVIC_ISER register
+    ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)
+    movs    r1, #0
+    lsls    r1, #13
+    str     r1, [r0]
+    bx      lr
 
-// alarm0 interrut 
-alarm0_isr:
- push {lr}                                      
- 
-@disable the interrupt 
- ldr r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
- movs r1, #0x1
- str r1, [r0]
-
-@enable alarm 
- ldr r0, =(TIMER_BASE + TIMER_INTE_OFFSET)
- ldr r2, [r0]
- movs r1, #0x1
- orr r1, r2
- str r1, [r0] 
-
-@clear alarm
- ldr r0, =(TIMER_BASE + TIMER_INTR_OFFSET)
- movs r1, #0x1
- str r1, [r0] 
-
-@ its a dash not a dot
- ldr r0, =long
- ldr r1, [r0]
- mov r1, #1
- str r1, [r0]
-
-alarm0_done:
- pop {pc}                                       
-
+/*
+ * GPIO interrupt service handler
+ */
 .thumb_func
-
-// alarm1 interrupt
-alarm1_isr:
- push {lr}                                      
- 
-@disable the interrupt 
- ldr r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
- movs r1, #0x2
- str r1, [r0]
-
-@enable alarm 
- ldr r0, =(TIMER_BASE + TIMER_INTE_OFFSET)
- ldr r2, [r0]
- movs r1, #0x2
- orr r1, r2
- str r1, [r0] 
-
-@clear alarm
- ldr r0, =(TIMER_BASE + TIMER_INTR_OFFSET)
- movs r1, #0x2
- str r1, [r0] 
-
-@ we are done
- ldr r0, =seqdone
- ldr r1, [r0]
- mov r1, #1
- str r1, [r0]
-
-
-alarm1_done:
- pop {pc} 
-
-.thumb_func
-
 gpio_isr:
- push {lr}
-
- ldr r0, =(IO_BANK0_BASE + IO_BANK0_PROC0_INTS2_OFFSET)
- ldr r1, [r0]
-
- ldr r0, =(IO_BANK0_BASE + IO_BANK0_INTR2_OFFSET)
- str r1, [r0]
-
- ldr r2, =GPIO_FALLING_EDGE
- cmp r1, r2
- beq set_alarm0
- @ may need extra code here 
- ldr r2, =GPIO_RISING_EDGE
- cmp r1, r2
-
-input:
- ldr r0, =long
- ldr r1, [r0]
- cmp r1, #1
- beq dash
-
-dot:
- ldr r0, =bv
- ldr r1, [r0]
- lsls r1, #1
- orr r1, #1
- str r1, [r0]
- 
- bl done
-
-dash:
- ldr r0, =bv
- ldr r1, [r0]
- lsls r1, #1
- orr r1, #0
- str r1, [r0]
- 
- ldr r0, =long
- ldr r1, [r0]
- movs r1, #0
- str r1, [r0]
- 
- bl done
-
-done:
- bl set_alarm1
- 
- pop {pc}
-
-set_alarm0:
- push {lr}
- @set alarm
- ldr r0, =(TIMER_BASE + TIMER_TIMELR_OFFSET)
- ldr r0, [r0]
- ldr r1, =ltimer
- ldr r1, [r1]
- add r1, r1, r0
- ldr r0, =(TIMER_BASE + TIMER_ALARM0_OFFSET)
- str r1, [r0]
-
- pop {pc}
-
-set_alarm1:
- push {lr}
- @set alarm
- ldr r0, =(TIMER_BASE + TIMER_TIMELR_OFFSET)
- ldr r0, [r0]
- ldr r1, =l1timer
- ldr r1, [r1]
- add r1, r1, r0
- ldr r0, =(TIMER_BASE + TIMER_ALARM1_OFFSET)
- str r1, [r0]
-
- 
- pop {pc}
-irq_enable_mask:
-@ r0 = mask
- ldr r1, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
- str r0, [r1]
- ldr r1, =(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)
- str r0, [r1]
- bx lr
-
-gpio_irq_enable:
- push {lr}
- movs r0, GPIO_BTN_EN
- bl asm_gpio_set_irq
- pop {pc}
+    push    {lr}
+    @ Load IO_BANK0 INTR2 register value to r1 (gp16-gp23)
+    ldr     r0, =(IO_BANK0_BASE + IO_BANK0_PROC0_INTS2_OFFSET)      
+    ldr     r1, [r0]
+    @ Detect fall/rise edge
+    ldr     r2, =#GP21_EDGE_FALL_MASK
+    cmp     r1, r2
+    beq     gpio_isr_edge_fall
+    ldr     r2, =#GP21_EDGE_RISE_MASK
+    cmp     r1, r2
+    beq     gpio_isr_edge_rise
+    b       gpio_isr_done
+gpio_isr_edge_fall:
+    @ Cancel exit alarm
+    bl      cancel_alarm_isr
+    @ Save edge fall timestamp
+    bl      time_ms
+    movs    r1, r0
+    ldr     r1, =edge_fall_time
+    str     r0, [r1]
+    b       gpio_isr_done
+gpio_isr_edge_rise:
+    @ Schedule exit alarm
+    bl      schedule_alarm_isr
+    @ Calculate delta between edge fall timestamp and edge rise timestamp
+    @ if (delta < 1000) gpio_isr_dot;
+    @ else              gpio_isr_dash;
+    bl      time_ms
+    ldr     r2, =edge_fall_time
+    ldr     r1, [r2]
+    subs    r0, r1
+    ldr     r1, =1000
+    cmp     r0, r1
+    blt     gpio_isr_dot
+    b       gpio_isr_dash
+gpio_isr_dot:
+    @ Put 0 in the buffer
+    ldr     r2, =morse_buffer
+    ldr     r0, [r2]
+    lsls    r0, #1
+    movs    r1, #DOT
+    orrs    r0, r1
+    str     r0, [r2]
+    b       gpio_isr_done
+gpio_isr_dash:
+    @ Put 1 in the buffer
+    ldr     r2, =morse_buffer
+    ldr     r0, [r2]
+    lsls    r0, #1
+    movs    r1, #DASH
+    orrs    r0, r1
+    str     r0, [r2]
+    b       gpio_isr_done
+gpio_isr_done:
+    @ Clear interrupt for gp21
+    ldr     r0, =(IO_BANK0_BASE + IO_BANK0_INTR2_OFFSET)
+    ldr     r1, =#0xf
+    lsls    r1, #20
+    str     r1, [r0]
+    pop     {pc}
 
 
-exit:
+/*
+ * ------------------------ alarm_isr ------------------------
+ */
+
+/*
+ * Install alarm_isr
+ */
+install_alarm_isr:
+    @ Set alarm_isr to ALARM0_ISR_OFFSET in the vector table
+    ldr     r2, =(PPB_BASE + M0PLUS_VTOR_OFFSET)
+    ldr     r1, [r2]
+    ldr     r0, =alarm_isr
+    str     r0, [r1, #ALARM0_ISR_OFFSET]
+    @ Enable ALARM0 interrupt clearing in NVIC_ICPR register
+    ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
+    movs    r1, #1
+    str     r1, [r0]
+    @ Enable ALARM0 interrupt in NVIC_ISER register
+    ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)
+    movs    r1, #1
+    str     r1, [r0]
+    bx      lr
+
+/*
+ * Schedule alarm_isr
+ */
+schedule_alarm_isr:
+    @ Enable ALARM0 interrupt
+    ldr     r1, =(TIMER_BASE + TIMER_INTE_OFFSET)
+    ldr     r2, [r1]
+    movs    r3, #1
+    lsls    r3, #TIMER_INTE_ALARM_0_LSB
+    orrs    r2, r3
+    str     r2, [r1]
+    @ Set TIMER_ALARM0 register value to TIMER_TIMELR + r0
+    ldr     r0, =ALARM0_DELAY
+    ldr     r1, =(TIMER_BASE + TIMER_TIMELR_OFFSET)
+    ldr     r2, [r1]
+    add     r2, r0
+    ldr     r1, =(TIMER_BASE + TIMER_ALARM0_OFFSET)
+    str     r2, [r1]
+    bx      lr
+
+/*
+ * Cancel alarm_isr
+ */
+cancel_alarm_isr:
+    @ Disable ALARM0 interrupt
+    ldr     r0, =(TIMER_BASE + TIMER_INTE_OFFSET)
+    ldr     r1, [r0]
+    movs    r2, #1
+    lsls    r2, #TIMER_INTE_ALARM_0_LSB
+    bics    r1, r2
+    str     r1, [r0]
+    @ Set TIMER_ALARM0 value to TIMER_TIMELR value + 0
+    ldr     r1, =(TIMER_BASE + TIMER_TIMELR_OFFSET)
+    ldr     r2, [r1]
+    ldr     r1, =(TIMER_BASE + TIMER_ALARM0_OFFSET)
+    str     r2, [r1]
+    @ Clear interrupt
+    ldr     r0, =(TIMER_BASE + TIMER_INTR_OFFSET)
+    movs    r1, #1
+    str     r1, [r0]
+    bx      lr
+
+/*
+ * Remove alarm_isr
+ */
+remove_alarm_isr:
+    @ Enable ALARM0 interrupt clearing in NVIC_ICPR register
+    ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
+    movs    r1, #0
+    str     r1, [r0]
+    @ Enable ALARM0 interrupt in NVIC_ISER register
+    ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)
+    movs    r1, #0
+    str     r1, [r0]
+    bx      lr
+
+/*
+ * Alarm interrupt service handler
+ */
+.thumb_func
+alarm_isr:
+    push    {lr}
+    @ Set is_input_done as true
+    movs    r0, #1
+    ldr     r1, =is_input_done
+    str     r0, [r1]
+    @ Clear interrupt
+    ldr     r0, =(TIMER_BASE + TIMER_INTR_OFFSET)
+    movs    r1, #1
+    str     r1, [r0]
+    pop     {pc}
 
 
 .align 4
-msg: .asciz "Hello World!\n"
-.data
+dot:       .asciz ".\n"
+dash:      .asciz "-\n"
 
-enable: .word ENABLE_DISABLE_STATE
-lstate: .word DFLT_STATE_STRT
-ltimer: .word DFLT_ALARM_TIME
-bv: .word BUTTON_VARIABLE
-l1timer: .word DFLT_ALARM1_TIME
-seqdone: .word SEQUNECE_DONE
-long: .word DASH
+.data
+morse_buffer:   .word MORSE_BUFFER_DFLT
+edge_fall_time: .word EDGE_FALL_TIME_DFLT
+is_input_done:  .word IS_INPUT_DONE_DFLT
