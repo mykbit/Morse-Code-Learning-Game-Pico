@@ -37,6 +37,16 @@ input_asm:
     bl      init_gp21
     bl      install_gpio_isr
     bl      install_alarm_isr
+input_asm_reset_data:
+    ldr     r0, =MORSE_BUFFER_DFLT
+    ldr     r1, =morse_buffer
+    str     r0, [r1]
+    ldr     r0, =EDGE_FALL_TIME_DFLT
+    ldr     r1, =edge_fall_time
+    str     r0, [r1]
+    ldr     r0, =IS_INPUT_DONE_DFLT
+    ldr     r1, =is_input_done
+    str     r0, [r1]
 input_asm_loop:
     ldr     r1, =is_input_done
     ldr     r0, [r1]
@@ -50,6 +60,7 @@ input_asm_done:
     ldr     r1, =morse_buffer
     ldr     r0, [r1]
     pop     {pc}
+
 
 /*
  * ------------------------ gpio_isr -------------------------
@@ -129,7 +140,7 @@ gpio_isr_edge_fall:
     @ Cancel exit alarm
     bl      cancel_alarm_isr
     @ Save edge fall timestamp
-    bl      time_ms
+    bl      asm_time_ms
     movs    r1, r0
     ldr     r1, =edge_fall_time
     str     r0, [r1]
@@ -140,7 +151,7 @@ gpio_isr_edge_rise:
     @ Calculate delta between edge fall timestamp and edge rise timestamp
     @ if (delta < 1000) gpio_isr_dot;
     @ else              gpio_isr_dash;
-    bl      time_ms
+    bl      asm_time_ms
     ldr     r2, =edge_fall_time
     ldr     r1, [r2]
     subs    r0, r1
