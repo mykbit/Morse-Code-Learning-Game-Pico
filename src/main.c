@@ -7,11 +7,13 @@
 #include "morse.c"
 #include "levels.c"
 
+// TODO: Add a group number to the title screen.
 int main() {
   stdio_init_all();
   ws2812_init();
 
   put_pixel(urgb_u32(0x00, 0x00, 0x1F));
+  
 
   // clang-format off
   printf("+---------------------------------------------------------------------+\n");
