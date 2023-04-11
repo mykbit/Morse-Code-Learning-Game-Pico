@@ -33,7 +33,7 @@ void asm_gpio_set_irq_edge_rise(uint pin) {
 uint32_t asm_time_ms() {
   return (unsigned int)(time_us_64() / CLOCKS_PER_SEC / 10);
 }
-
+// Initialise watchdog timer
 void watchdog_init(int delay) {
   watchdog_enable(delay, 1);
 
