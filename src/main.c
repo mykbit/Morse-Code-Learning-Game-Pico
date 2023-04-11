@@ -1,35 +1,44 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "pico/stdlib.h"
-#include "hardware/gpio.h"
 
-void main_asm();
+#include "ws2812.h"
+#include "input_asm.h"
+#include "morse.c"
+#include "levels.c"
 
-// Initialise a GPIO pin – see SDK for detail on gpio_init()
-void asm_gpio_init(uint pin) {
-    gpio_init(pin);
-}
-
-// Set direction of a GPIO pin – see SDK for detail on gpio_set_dir()
-void asm_gpio_set_dir(uint pin, bool out) {
-    gpio_set_dir(pin, out);
-}
-
-// Get the value of a GPIO pin – see SDK for detail on gpio_get()
-bool asm_gpio_get(uint pin) {
-    return gpio_get(pin);
-}
-
-// Set the value of a GPIO pin – see SDK for detail on gpio_put()
-void asm_gpio_put(uint pin, bool value) {
-    gpio_put(pin, value);
-}
-
+// TODO: Add a group number to the title screen.
 int main() {
-    stdio_init_all();
+  stdio_init_all();
+  watchdog_init(19000);
+  ws2812_init();
 
-    printf("Hey!\n");
+  put_pixel(urgb_u32(0x00, 0x00, 0x1F));
 
-    main_asm();
+  // clang-format off
+  printf("|----------------------------- GROUP #16 -----------------------------|\n");
+  printf("+---------------------------------------------------------------------+\n");
+  printf("|                                                                     |\n");
+  printf("|      #           #######        #         #######     #      #      |\n");
+  printf("|      #           #            #   #       #      #    ##     #      |\n");
+  printf("|      #           #           #     #      #      #    # #    #      |\n");
+  printf("|      #           #####      # # # # #     #######     #  #   #      |\n");
+  printf("|      #           #          #       #     #    #      #   #  #      |\n");
+  printf("|      #           #          #       #     #     #     #    # #      |\n");
+  printf("|      ########    #######    #       #     #      #    #     ##      |\n");
+  printf("|                                                                     |\n");
+  printf("|     #        #    ########    #######       #####      ########     |\n");
+  printf("|     ##      ##    #      #    #      #     #      #    #            |\n");
+  printf("|     # #    # #    #      #    #      #     #           #            |\n");
+  printf("|     #  #  #  #    #      #    #######       #####      #####        |\n");
+  printf("|     #   ##   #    #      #    #    #              #    #            |\n");
+  printf("|     #        #    #      #    #     #      #      #    #            |\n");
+  printf("|     #        #    ########    #      #      #####      ########     |\n");
+  printf("|                                                                     |\n");
+  printf("+---------------------------------------------------------------------+\n");
+  // clang-format on
 
-    return 0;
+  level_play(level_select());
+
+  return 0;
 }

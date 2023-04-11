@@ -17,7 +17,7 @@
     }
   },
   "cmake.configureEnvironment": {
-    "PROJECT_NAME": "morse_code",
+    "PROJECT_NAME": "morse_code"
   },
   "cmake.generator": "Unix Makefiles",
   "cmake.configureOnOpen": false,
