@@ -4,7 +4,7 @@
 #include "hardware/gpio.h"
 #include "pico/stdlib.h"
 
-#define WIN_THRESHOLD 5 // Number of correct answers to clear the level
+#define WIN_THRESHOLD 2 // Number of correct answers to clear the level
 
 char selected_level;
 int consequent_wins;

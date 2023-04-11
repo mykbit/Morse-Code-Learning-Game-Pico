@@ -15,16 +15,16 @@ char* morse_alphanum_arr[] = {
 char* word_arr[] = {"HELLO",  "WORLD",  "PICO", "SCALA",  "CLARITY",
                     "PYTHON", "SUFFER", "RUST", "ENDURE", "JAVA"};
 
-char* morse_word_arr[] = {"......-...-..---",
-                          ".-----.-..-..-..",
-                          ".--...-.-.---",
-                          "...-.-..-.-...-",
-                          "-.-..-...-.-...--.--",
-                          ".--.-.---....----.",
-                          ".....-..-...-...-.",
-                          ".-...-...-",
-                          ".-.-....-.-..",
-                          ".---.-...-.-"};
+char* morse_word_arr[] = {".... . .-.. .-.. ---",
+                          ".-- --- .-. .-.. -..",
+                          ".--. .. -.-. ---",
+                          "... -.-. .- .-.. .-",
+                          "-.-. .-.. .- .-. .. - -.--",
+                          ".--. -.-- - .... --- -.",
+                          "... ..- ..-. ..-. . .-.",
+                          ".-. ..- ... -",
+                          ". -. -.. ..- .-. .",
+                          ".--- .- ...- .-"};
 
 char selected_level;
 int consequent_wins = 0;
@@ -33,7 +33,12 @@ int str_index = 0;
 int level_attempts = 0;
 int level_wins = 0;
 int total_attempts = 0;
-int total_wins = 0;
+
+int get_seed() { 
+  time_t t; 
+  srand((unsigned) time(&t));
+  return rand();
+}
 
 /**
  * @brief Level 1
@@ -44,8 +49,8 @@ int total_wins = 0;
  *  @return A pointer to the selected alphanumeric character.
  */
 char* level1() {
-  srand(time(NULL));
-  int index = random() % 36;
+  srand(get_seed());
+  int index = rand() % 36;
   char* task_letter = &alphanum_arr[index];
   char* task_morse = morse_alphanum_arr[index];
   printf("Level 1: %c or %s\n", *task_letter, task_morse);
@@ -62,7 +67,7 @@ char* level1() {
  * @return A pointer to the selected alphanumeric character.
 */
 char* level2() {
-  srand(time(NULL));
+  srand(get_seed());
   int index = rand() % 36;
   char* task_letter = &alphanum_arr[index];
   printf("Level 2: %c\n", *task_letter);
@@ -78,6 +83,7 @@ char* level2() {
  * @return A pointer to the selected word.
  */
 char* level3() {
+  srand(get_seed());
   int index = rand() % 10;
   char* task_word = word_arr[index];
   char* task_morse = morse_word_arr[index];
@@ -94,6 +100,7 @@ char* level3() {
  * @return A pointer to the selected word.
 */
 char* level4() {
+  srand(get_seed());
   int index = rand() % 10;
   char* task_word = word_arr[index];
   printf("Level 4: %s\n", task_word);
@@ -158,6 +165,7 @@ char* level_select() {
  */
 char* level_restart () {
   printf("Restarting level %c...\n", (int)selected_level+1);
+  str_index = 0;
   if (selected_level == '0') {
     return level1();
   }
@@ -259,6 +267,7 @@ void level3_and_4_play(char* task) {
   
   unsigned int input = input_asm();
   char input_char = binary_to_ascii(input);
+  printf("User input: %c - '%s'\n", input_char, binary_to_morse(input));
   if (task[str_index] == input_char) {
     if (str_index == strlen(task)-1) {
       level_attempts++;
@@ -281,6 +290,7 @@ void level3_and_4_play(char* task) {
         consequent_wins = 0;
         printf("Level clear!\n");
         level_stats();
+
         level3_and_4_play(level_next());
       }
       else {
@@ -325,12 +335,13 @@ void level3_and_4_play(char* task) {
  * @param task             The task for the current level
  */
 void level_play (char* task) {
-  level_attempts++;
-  total_attempts++;
+
   if (selected_level != '0' && selected_level != '1') {
     level3_and_4_play(task);
   }
   else {
+    level_attempts++;
+    total_attempts++;
     unsigned int input = input_asm();
     char input_char = binary_to_ascii(input);
     printf("User input: %c - %s\n", input_char, binary_to_morse(input));
