@@ -2,6 +2,7 @@
 
 #include "hardware/gpio.h"
 #include "hardware/pio.h"
+#include "hardware/watchdog.h"
 
 // Input assembly function
 unsigned int input_asm();
@@ -31,4 +32,12 @@ void asm_gpio_set_irq_edge_rise(uint pin) {
 // Get timestamp in ms
 uint32_t asm_time_ms() {
   return (unsigned int)(time_us_64() / CLOCKS_PER_SEC / 10);
+}
+
+void watchdog_init(int delay) {
+  watchdog_enable(delay, 1);
+
+  if (watchdog_caused_reboot()) {
+    printf("\nStarting new game...\n\n");
+  }
 }

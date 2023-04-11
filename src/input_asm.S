@@ -125,6 +125,7 @@ remove_gpio_isr:
 .thumb_func
 gpio_isr:
     push    {lr}
+    bl      watchdog_update
     @ Load IO_BANK0 INTR2 register value to r1 (gp16-gp23)
     ldr     r0, =(IO_BANK0_BASE + IO_BANK0_PROC0_INTS2_OFFSET)      
     ldr     r1, [r0]
