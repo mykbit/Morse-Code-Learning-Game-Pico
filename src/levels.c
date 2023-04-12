@@ -270,7 +270,7 @@ void level_play (char* task) {
     total_attempts++;
     unsigned int input = input_asm();
     char input_char = binary_to_ascii(input);
-    printf("User input: %c - %s\n", input_char, binary_to_morse(input));
+    printf("User input: %c - '%s'\n", input_char, binary_to_morse(input));
 
     if (input_char == task[0]) {
       printf("Correct!\n");
