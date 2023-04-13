@@ -34,7 +34,7 @@ uint32_t asm_time_ms() {
   return (unsigned int)(time_us_64() / CLOCKS_PER_SEC / 10);
 }
 // Initialise watchdog timer
-void watchdog_init(int delay) {
+void watchdog_init(uint32_t delay) {
   watchdog_enable(delay, 1);
 
   if (watchdog_caused_reboot()) {
