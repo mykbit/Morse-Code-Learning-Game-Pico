@@ -107,12 +107,12 @@ install_gpio_isr:
  * Remove gpio_isr
  */
 remove_gpio_isr:
-    @ Enable GPIO interrupt clearing in NVIC_ICPR register
+    @ Disable GPIO interrupt clearing in NVIC_ICPR register
     ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
     movs    r1, #0
     lsls    r1, #13
     str     r1, [r0]
-    @ Enable GPIO interrupt in NVIC_ISER register
+    @ Disable GPIO interrupt in NVIC_ISER register
     ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)
     movs    r1, #0
     lsls    r1, #13
@@ -256,11 +256,11 @@ cancel_alarm_isr:
  * Remove alarm_isr
  */
 remove_alarm_isr:
-    @ Enable ALARM0 interrupt clearing in NVIC_ICPR register
+    @ Disable ALARM0 interrupt clearing in NVIC_ICPR register
     ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ICPR_OFFSET)
     movs    r1, #0
     str     r1, [r0]
-    @ Enable ALARM0 interrupt in NVIC_ISER register
+    @ Disable ALARM0 interrupt in NVIC_ISER register
     ldr     r0, =(PPB_BASE + M0PLUS_NVIC_ISER_OFFSET)
     movs    r1, #0
     str     r1, [r0]
