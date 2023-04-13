@@ -7,7 +7,6 @@
 #include "morse.c"
 #include "levels.c"
 
-// TODO: Add a group number to the title screen.
 int main() {
   stdio_init_all();
   watchdog_init(9000);
