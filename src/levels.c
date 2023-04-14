@@ -217,7 +217,7 @@ void level3_and_4_play(char* task) {
       str_index = 0;
       
       if (consequent_wins >= WIN_THRESHOLD) {
-        if (selected_level == '3') {
+        if (selected_level == '3') { // level 4 
           printf("Congratulations! You have completed the game!\n");
           put_pixel(urgb_u32(0x1F, 0x1F, 0x1F));
           level_stats();
